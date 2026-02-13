@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>❤️ Happy Valentine's Day ❤️</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a021e;
+            font-family: 'Quicksand', 'Segoe UI', Arial, sans-serif;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 1
+        }
+
+        /* ===== NAME INPUT SCREEN ===== */
+        .name-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: radial-gradient(ellipse at center, #1a0835 0%, #0a021e 70%);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .name-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1)
+        }
+
+        .name-box {
+            text-align: center;
+            animation: fadeUp 1s ease
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .name-box h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(28px, 7vw, 52px);
+            color: #ff80b0;
+            margin-bottom: 8px;
+            text-shadow: 0 0 30px rgba(255, 100, 170, 0.4);
+        }
+
+        .name-box p {
+            color: #c8a0e0;
+            font-size: clamp(13px, 3vw, 17px);
+            margin-bottom: 28px;
+            opacity: 0.8
+        }
+
+        .name-input {
+            width: min(80vw, 320px);
+            padding: 14px 20px;
+            border: 2px solid #ff80b040;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffe0f0;
+            font-size: 18px;
+            text-align: center;
+            font-family: 'Quicksand', sans-serif;
+            outline: none;
+            transition: border-color .3s, box-shadow .3s;
+        }
+
+        .name-input::placeholder {
+            color: #ff80b060
+        }
+
+        .name-input:focus {
+            border-color: #ff60a0;
+            box-shadow: 0 0 20px rgba(255, 100, 170, 0.25)
+        }
+
+        .start-btn {
+            margin-top: 22px;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ff3070, #ff6098);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 4px 20px rgba(255, 50, 100, 0.4);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(255, 50, 100, 0.6)
+        }
+
+        .start-btn:active {
+            transform: scale(0.97)
+        }
+
+        /* ===== EFFECT LABELS ===== */
+        .effect-label {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 90;
+            pointer-events: none;
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(32px, 8vw, 56px);
+            color: #fff;
+            text-shadow: 0 0 40px rgba(255, 100, 170, 0.6);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .effect-label.show {
+            opacity: 1
+        }
+
+        /* ===== POETIC TEXT ===== */
+        .poetic-text {
+            position: fixed;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(20px, 5vw, 32px);
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(255, 50, 100, 0.6);
+            opacity: 0;
+            transition: opacity 1.5s ease, transform 1.5s ease;
+            z-index: 95;
+            pointer-events: none;
+            background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.3), transparent);
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        .poetic-text.show {
+            opacity: 1;
+            transform: translate(-50%, -60%)
+        }
+
+        /* ===== LETTER OVERLAY ===== */
+        .letter-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            pointer-events: none;
+            opacity: 0;
+            background: rgba(0, 0, 0, 0);
+            transition: background 0.6s ease, opacity 0.6s ease;
+        }
+
+        .letter-overlay.open {
+            pointer-events: auto;
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.78)
+        }
+
+        .letter-card {
+            width: min(90vw, 500px);
+            background: linear-gradient(145deg, #fff8eb 0%, #fff3e0 40%, #fef0d8 100%);
+            border-radius: 18px;
+            padding: 40px 28px 32px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 80, 130, 0.12);
+            border: 2px solid #dcc0a0;
+            position: relative;
+            transform: translateY(80px) scale(0.85);
+            opacity: 0;
+            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+        }
+
+        .letter-overlay.open .letter-card {
+            transform: translateY(0) scale(1);
+            opacity: 1
+        }
+
+        .seal {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            background: radial-gradient(circle at 38% 36%, #e83058, #a01020);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .seal::after {
+            content: '♥';
+            color: #fdd;
+            font-size: 22px
+        }
+
+        .inner-border {
+            border: 1px solid #e8d5c0;
+            border-radius: 12px;
+            padding: 26px 18px;
+        }
+
+        .corner {
+            position: absolute;
+            color: #ff96b4;
+            font-size: 14px;
+            opacity: 0.6
+        }
+
+        .corner.tl {
+            top: 13px;
+            left: 15px
+        }
+
+        .corner.tr {
+            top: 13px;
+            right: 15px
+        }
+
+        .corner.bl {
+            bottom: 13px;
+            left: 15px
+        }
+
+        .corner.br {
+            bottom: 13px;
+            right: 15px
+        }
+
+        .letter-to {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            color: #c03060;
+            font-size: clamp(22px, 5.5vw, 30px);
+            margin-bottom: 6px;
+        }
+
+        .letter-name {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            color: #e02050;
+            font-size: clamp(28px, 7vw, 40px);
+            margin-bottom: 14px;
+            text-shadow: 0 0 15px rgba(255, 50, 100, 0.2);
+        }
+
+        .letter-divider {
+            width: 60%;
+            margin: 0 auto 16px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dcc0a0, transparent);
+        }
+
+        .letter-body {
+            text-align: center;
+            color: #5a4030;
+            font-size: clamp(13px, 3.2vw, 16.5px);
+            line-height: 1.9;
+        }
+
+        .letter-sign {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            color: #c82850;
+            font-size: clamp(20px, 5vw, 28px);
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #e8d5c0;
+        }
+
+        .close-btn {
+            margin-top: 22px;
+            color: #ffb0c8;
+            font-size: 16px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.4s, color 0.2s;
+            padding: 12px 24px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .letter-overlay.open .close-btn {
+            opacity: 1
+        }
+
+        .close-btn:hover {
+            color: #fff
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAME INPUT -->
+    <div class="name-screen" id="nameScreen">
+        <div class="name-box">
+            <h1>💌 Valentine's Day</h1>
+            <p>Nhập tên người bạn muốn gửi thư</p>
+            <input class="name-input" id="nameInput" type="text" placeholder="Nhập tên..." maxlength="30"
+                autocomplete="off">
+            <br>
+            <button class="start-btn" id="startBtn" onclick="startShow()">Bắt đầu ♥</button>
+        </div>
+    </div>
+
+    <!-- EFFECT LABEL -->
+    <div class="effect-label" id="effectLabel"></div>
+
+    <!-- POETIC TEXT CONTAINER -->
+    <div class="poetic-text" id="poeticText"></div>
+
+    <!-- CANVAS -->
+    <canvas id="c"></canvas>
+
+    <!-- LETTER -->
+    <div class="letter-overlay" id="letterOverlay">
+        <div class="letter-card" onclick="event.stopPropagation()">
+            <div class="seal"></div>
+            <span class="corner tl">♥</span><span class="corner tr">♥</span>
+            <span class="corner bl">♥</span><span class="corner br">♥</span>
+            <div class="inner-border">
+                <div class="letter-to">Gửi đến</div>
+                <div class="letter-name" id="letterName">...</div>
+                <div class="letter-divider"></div>
+                <div class="letter-body">
+                    Mỗi ngày trôi qua, anh đều cảm thấy<br>
+                    thật may mắn vì có em bên cạnh.<br><br>
+                    Em là ánh sáng trong những ngày u ám,<br>
+                    là nụ cười trong những lúc khó khăn,<br>
+                    là nhịp đập trong trái tim anh.<br><br>
+                    Valentine này, anh chỉ muốn nói:<br>
+                    <em>Cảm ơn em vì đã là em.</em>
+                </div>
+                <div class="letter-sign">Yêu em mãi mãi! ♥</div>
+            </div>
+        </div>
+        <button class="close-btn" onclick="closeLetter()">✕ Đóng thư</button>
+    </div>
+
+    <script>
+        // ===== CANVAS =====
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        let W, H, cx, cy, dpr;
+        function resize() {
+            dpr = window.devicePixelRatio || 1;
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            cx = W / 2; cy = H / 2 - H * 0.04;
+        }
+        resize(); window.addEventListener('resize', resize);
+
+        const PI2 = Math.PI * 2;
+        function heartX(t, s) { return s * 16 * Math.pow(Math.sin(t), 3) }
+        function heartY(t, s) { return s * -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) }
+        function hs() { return Math.min(W, H) / 65 }
+
+        // ===== STARS (always) =====
+        const stars = [];
+        for (let i = 0; i < 90; i++) stars.push({ x: Math.random(), y: Math.random(), s: 0.3 + Math.random() * 1.5, sp: 0.01 + Math.random() * 0.05, ph: Math.random() * PI2, c: ['#fff', '#ccf', '#fdf'][~~(Math.random() * 3)] });
+
+        // ===== STATE =====
+        let phase = 'idle'; // idle, effect1, effect2, effect3, heart, letter
+        let userName = '';
+        let frame = 0, beatPhase = 0, introProgress = 0;
+        let effectTimer = 0;
+        let effectItems = [];
+        let heartAlpha = 0;
+        let textAlpha = 0;
+
+        // ===== POETRY TEXT START =====
+        function updatePoetry(text) {
+            const el = document.getElementById('poeticText');
+            el.classList.remove('show');
+            setTimeout(() => {
+                if (text) {
+                    el.textContent = text;
+                    el.classList.add('show');
+                }
+            }, 1000); // Wait for fade out
+        }
+        // ===== POETRY TEXT END =====r
