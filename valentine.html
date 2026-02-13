@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>❤️ Happy Valentine's Day ❤️</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0a021e;
+            font-family: 'Quicksand', 'Segoe UI', Arial, sans-serif;
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 1
+        }
+
+        /* ===== NAME INPUT SCREEN ===== */
+        .name-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: radial-gradient(ellipse at center, #1a0835 0%, #0a021e 70%);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .name-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.1)
+        }
+
+        .name-box {
+            text-align: center;
+            animation: fadeUp 1s ease
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .name-box h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(28px, 7vw, 52px);
+            color: #ff80b0;
+            margin-bottom: 8px;
+            text-shadow: 0 0 30px rgba(255, 100, 170, 0.4);
+        }
+
+        .name-box p {
+            color: #c8a0e0;
+            font-size: clamp(13px, 3vw, 17px);
+            margin-bottom: 28px;
+            opacity: 0.8
+        }
+
+        .name-input {
+            width: min(80vw, 320px);
+            padding: 14px 20px;
+            border: 2px solid #ff80b040;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffe0f0;
+            font-size: 18px;
+            text-align: center;
+            font-family: 'Quicksand', sans-serif;
+            outline: none;
+            transition: border-color .3s, box-shadow .3s;
+        }
+
+        .name-input::placeholder {
+            color: #ff80b060
+        }
+
+        .name-input:focus {
+            border-color: #ff60a0;
+            box-shadow: 0 0 20px rgba(255, 100, 170, 0.25)
+        }
+
+        .start-btn {
+            margin-top: 22px;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ff3070, #ff6098);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 4px 20px rgba(255, 50, 100, 0.4);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(255, 50, 100, 0.6)
+        }
+
+        .start-btn:active {
+            transform: scale(0.97)
+        }
+
+        /* ===== EFFECT LABELS ===== */
+        .effect-label {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 90;
+            pointer-events: none;
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(32px, 8vw, 56px);
+            color: #fff;
+            text-shadow: 0 0 40px rgba(255, 100, 170, 0.6);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .effect-label.show {
+            opacity: 1
+        }
+
+        /* ===== POETIC TEXT ===== */
+        .poetic-text {
+            position: fixed;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(20px, 5vw, 32px);
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(255, 50, 100, 0.6);
+            opacity: 0;
+            transition: opacity 1.5s ease, transform 1.5s ease;
+            z-index: 95;
+            pointer-events: none;
+            background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.3), transparent);
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        .poetic-text.show {
+            opacity: 1;
+            transform: translate(-50%, -60%)
+        }
+
+        /* ===== LETTER OVERLAY ===== */
+        .letter-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            pointer-events: none;
+            opacity: 0;
+            background: rgba(0, 0, 0, 0);
+            transition: background 0.6s ease, opacity 0.6s ease;
+        }
+
+        .letter-overlay.open {
+            pointer-events: auto;
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.78)
+        }
+
+        .letter-card {
+            width: min(90vw, 500px);
+            background: linear-gradient(145deg, #fff8eb 0%, #fff3e0 40%, #fef0d8 100%);
+            border-radius: 18px;
+            padding: 40px 28px 32px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 80, 130, 0.12);
+            border: 2px solid #dcc0a0;
+            position: relative;
+            transform: translateY(80px) scale(0.85);
+            opacity: 0;
+            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+        }
+
+        .letter-overlay.open .letter-card {
+            transform: translateY(0) scale(1);
+            opacity: 1
+        }
+
+        .seal {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 48px;
+            background: radial-gradient(circle at 38% 36%, #e83058, #a01020);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .seal::after {
+            content: '♥';
+            color: #fdd;
+            font-size: 22px
+        }
+
+        .inner-border {
+            border: 1px solid #e8d5c0;
+            border-radius: 12px;
+            padding: 26px 18px;
+        }
+
+        .corner {
+            position: absolute;
+            color: #ff96b4;
+            font-size: 14px;
+            opacity: 0.6
+        }
+
+        .corner.tl {
+            top: 13px;
+            left: 15px
+        }
+
+        .corner.tr {
+            top: 13px;
+            right: 15px
+        }
+
+        .corner.bl {
+            bottom: 13px;
+            left: 15px
+        }
+
+        .corner.br {
+            bottom: 13px;
+            right: 15px
+        }
+
+        .letter-to {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            color: #c03060;
+            font-size: clamp(22px, 5.5vw, 30px);
+            margin-bottom: 6px;
+        }
+
+        .letter-name {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            color: #e02050;
+            font-size: clamp(28px, 7vw, 40px);
+            margin-bottom: 14px;
+            text-shadow: 0 0 15px rgba(255, 50, 100, 0.2);
+        }
+
+        .letter-divider {
+            width: 60%;
+            margin: 0 auto 16px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dcc0a0, transparent);
+        }
+
+        .letter-body {
+            text-align: center;
+            color: #5a4030;
+            font-size: clamp(13px, 3.2vw, 16.5px);
+            line-height: 1.9;
+        }
+
+        .letter-sign {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            color: #c82850;
+            font-size: clamp(20px, 5vw, 28px);
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #e8d5c0;
+        }
+
+        .close-btn {
+            margin-top: 22px;
+            color: #ffb0c8;
+            font-size: 16px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.4s, color 0.2s;
+            padding: 12px 24px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .letter-overlay.open .close-btn {
+            opacity: 1
+        }
+
+        .close-btn:hover {
+            color: #fff
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAME INPUT -->
+    <div class="name-screen" id="nameScreen">
+        <div class="name-box">
+            <h1>💌 Valentine's Day</h1>
+            <p>Nhập tên người bạn muốn gửi thư</p>
+            <input class="name-input" id="nameInput" type="text" placeholder="Nhập tên..." maxlength="30"
+                autocomplete="off">
+            <br>
+            <button class="start-btn" id="startBtn" onclick="startShow()">Bắt đầu ♥</button>
+        </div>
+    </div>
+
+    <!-- EFFECT LABEL -->
+    <div class="effect-label" id="effectLabel"></div>
+
+    <!-- POETIC TEXT CONTAINER -->
+    <div class="poetic-text" id="poeticText"></div>
+
+    <!-- CANVAS -->
+    <canvas id="c"></canvas>
+
+    <!-- LETTER -->
+    <div class="letter-overlay" id="letterOverlay">
+        <div class="letter-card" onclick="event.stopPropagation()">
+            <div class="seal"></div>
+            <span class="corner tl">♥</span><span class="corner tr">♥</span>
+            <span class="corner bl">♥</span><span class="corner br">♥</span>
+            <div class="inner-border">
+                <div class="letter-to">Gửi đến</div>
+                <div class="letter-name" id="letterName">...</div>
+                <div class="letter-divider"></div>
+                <div class="letter-body">
+                    Mỗi ngày trôi qua, anh đều cảm thấy<br>
+                    thật may mắn vì có em bên cạnh.<br><br>
+                    Em là ánh sáng trong những ngày u ám,<br>
+                    là nụ cười trong những lúc khó khăn,<br>
+                    là nhịp đập trong trái tim anh.<br><br>
+                    Valentine này, anh chỉ muốn nói:<br>
+                    <em>Cảm ơn em vì đã là em.</em>
+                </div>
+                <div class="letter-sign">Yêu em mãi mãi! ♥</div>
+            </div>
+        </div>
+        <button class="close-btn" onclick="closeLetter()">✕ Đóng thư</button>
+    </div>
+
+    <script>
+        // ===== CANVAS =====
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        let W, H, cx, cy, dpr;
+        function resize() {
+            dpr = window.devicePixelRatio || 1;
+            W = window.innerWidth; H = window.innerHeight;
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            cx = W / 2; cy = H / 2 - H * 0.04;
+        }
+        resize(); window.addEventListener('resize', resize);
+
+        const PI2 = Math.PI * 2;
+        function heartX(t, s) { return s * 16 * Math.pow(Math.sin(t), 3) }
+        function heartY(t, s) { return s * -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) }
+        function hs() { return Math.min(W, H) / 65 }
+
+        // ===== STARS (always) =====
+        const stars = [];
+        for (let i = 0; i < 90; i++) stars.push({ x: Math.random(), y: Math.random(), s: 0.3 + Math.random() * 1.5, sp: 0.01 + Math.random() * 0.05, ph: Math.random() * PI2, c: ['#fff', '#ccf', '#fdf'][~~(Math.random() * 3)] });
+
+        // ===== STATE =====
+        let phase = 'idle'; // idle, effect1, effect2, effect3, heart, letter
+        let userName = '';
+        let frame = 0, beatPhase = 0, introProgress = 0;
+        let effectTimer = 0;
+        let effectItems = [];
+        let heartAlpha = 0;
+        let textAlpha = 0;
+
+        // ===== POETRY TEXT START =====
+        function updatePoetry(text) {
+            const el = document.getElementById('poeticText');
+            el.classList.remove('show');
+            setTimeout(() => {
+                if (text) {
+                    el.textContent = text;
+                    el.classList.add('show');
+                }
+            }, 1000); // Wait for fade out
+        }
+        // ===== POETRY TEXT END =====
+
+        // ===== START =====
+        function startShow() {
+            userName = document.getElementById('nameInput').value.trim() || 'Em';
+            document.getElementById('letterName').textContent = userName + ' ♥';
+            document.getElementById('nameScreen').classList.add('hide');
+            setTimeout(() => {
+                phase = 'effect1'; effectTimer = 0; effectItems = [];
+                showLabel('💕 Trái Tim');
+                updatePoetry("Giữa muôn vạn người, trái tim anh chỉ rung động vì một người...");
+            }, 900);
+        }
+
+        // Enter key
+        document.getElementById('nameInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') startShow();
+        });
+
+        // ===== EFFECT LABEL =====
+        function showLabel(text) {
+            const el = document.getElementById('effectLabel');
+            el.textContent = text;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2200);
+        }
+
+        // ===== LETTER =====
+        function openLetter() {
+            document.getElementById('letterOverlay').classList.add('open');
+        }
+        function closeLetter() {
+            document.getElementById('letterOverlay').classList.remove('open');
+        }
+
+        // ===== HEART PATH =====
+        function heartPath(cx, cy, sc, n) {
+            ctx.beginPath();
+            for (let i = 0; i <= n; i++) {
+                const t = PI2 * i / n;
+                const x = cx + heartX(t, sc), y = cy + heartY(t, sc);
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+        }
+
+        // ===== EFFECT 1: FALLING HEARTS =====
+        function spawnHeart() {
+            effectItems.push({
+                type: 'heart', x: Math.random() * W, y: -30,
+                s: 1.5 + Math.random() * 3,
+                vy: 1.5 + Math.random() * 3,
+                vx: (Math.random() - 0.5) * 1.5,
+                rot: Math.random() * 0.5 - 0.25,
+                a: 0.3 + Math.random() * 0.7,
+                c: ['#ff3070', '#ff5090', '#ff70a8', '#ff90c0', '#e04080', '#ff2060'][~~(Math.random() * 6)]
+            });
+        }
+
+        // ===== EFFECT 2: SHOOTING STARS =====
+        function spawnShootingStar() {
+            const startX = Math.random() * W * 0.3;
+            const startY = Math.random() * H * 0.3;
+            effectItems.push({
+                type: 'star',
+                x: startX, y: startY,
+                vx: 4 + Math.random() * 6,
+                vy: 2 + Math.random() * 4,
+                life: 1, decay: 0.008 + Math.random() * 0.008,
+                len: 40 + Math.random() * 80,
+                c: ['#ffd700', '#fff', '#ffe0a0', '#ffa', '#ffc860'][~~(Math.random() * 5)]
+            });
+        }
+
+        // ===== EFFECT 3: ROSE PETALS =====
+        function spawnPetal() {
+            effectItems.push({
+                type: 'petal',
+                x: Math.random() * W, y: -20,
+                vy: 0.8 + Math.random() * 2,
+                vx: (Math.random() - 0.5) * 1.5,
+                rot: Math.random() * PI2,
+                rotV: (Math.random() - 0.5) * 0.04,
+                s: 8 + Math.random() * 14,
+                a: 0.4 + Math.random() * 0.6,
+                c: ['#ff3050', '#e82848', '#ff5070', '#d42040', '#ff7090', '#c81838'][~~(Math.random() * 6)]
+            });
+        }
+
+        // ===== DRAW PETAL =====
+        function drawPetal(p) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.globalAlpha = p.a;
+            ctx.fillStyle = p.c;
+            // Rose petal shape
+            ctx.beginPath();
+            ctx.moveTo(0, -p.s * 0.6);
+            ctx.bezierCurveTo(p.s * 0.5, -p.s * 0.6, p.s * 0.7, 0, 0, p.s * 0.6);
+            ctx.bezierCurveTo(-p.s * 0.7, 0, -p.s * 0.5, -p.s * 0.6, 0, -p.s * 0.6);
+            ctx.fill();
+            // vein
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -p.s * 0.4);
+            ctx.lineTo(0, p.s * 0.4);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // ===== PARTICLES (heart phase) =====
+        let particles = [];
+        function spawnParticle() {
+            const sc = hs() * introEase;
+            const a = Math.random() * PI2;
+            particles.push({
+                x: cx + heartX(a, sc * 0.8), y: cy + heartY(a, sc * 0.8),
+                vx: (Math.random() - 0.5) * 0.8, vy: -0.5 - Math.random() * 2,
+                life: 1, decay: 0.008 + Math.random() * 0.012,
+                size: 1 + Math.random() * 2.5,
+                c: ['#ffd700', '#fff', '#ffb4dc', '#ff6496', '#c8a0ff', '#ff9632'][~~(Math.random() * 6)]
+            });
+        }
+
+        let introEase = 0;
+
+        // ===== MAIN LOOP =====
+        let last = 0;
+        function loop(now) {
+            requestAnimationFrame(loop);
+            const dt = Math.min(0.05, (now - last) / 1000);
+            last = now; frame++;
+
+            // ---- BACKGROUND ----
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
+            grad.addColorStop(0, '#0a021e');
+            grad.addColorStop(1, '#28053c');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // ---- STARS ----
+            for (const st of stars) {
+                st.ph += st.sp * dt;
+                const b = 0.3 + 0.7 * (Math.sin(st.ph) * 0.5 + 0.5);
+                ctx.globalAlpha = b * 0.7;
+                ctx.fillStyle = st.c;
+                ctx.beginPath();
+                ctx.arc(st.x * W, st.y * H, st.s * b, 0, PI2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // ===== EFFECT PHASES =====
+            if (phase === 'effect1') {
+                // Falling hearts
+                effectTimer += dt;
+                if (frame % 3 === 0) spawnHeart();
+                for (let i = effectItems.length - 1; i >= 0; i--) {
+                    const h = effectItems[i];
+                    h.y += h.vy; h.x += h.vx;
+                    ctx.globalAlpha = h.a;
+                    ctx.fillStyle = h.c;
+                    const sc = h.s * (Math.min(W, H) / 750);
+                    heartPath(h.x, h.y, sc, 50);
+                    ctx.fill();
+                    if (h.y > H + 40) effectItems.splice(i, 1);
+                }
+                ctx.globalAlpha = 1;
+                if (effectTimer > 6.0) {
+                    phase = 'effect2'; effectTimer = 0; effectItems = [];
+                    showLabel('🌠 Sao Băng');
+                    updatePoetry("Mỗi ngôi sao băng qua là một điều ước anh dành riêng cho " + userName + "...");
+                }
+            }
+
+            else if (phase === 'effect2') {
+                // Shooting stars
+                effectTimer += dt;
+                if (frame % 8 === 0) spawnShootingStar();
+                for (let i = effectItems.length - 1; i >= 0; i--) {
+                    const s = effectItems[i];
+                    s.x += s.vx; s.y += s.vy; s.life -= s.decay;
+                    if (s.life <= 0) { effectItems.splice(i, 1); continue }
+                    // Trail
+                    const tailX = s.x - s.vx * (s.len / 5);
+                    const tailY = s.y - s.vy * (s.len / 5);
+                    const tg = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
+                    tg.addColorStop(0, 'rgba(255,255,255,0)');
+                    tg.addColorStop(1, s.c);
+                    ctx.strokeStyle = tg;
+                    ctx.lineWidth = 2;
+                    ctx.globalAlpha = s.life;
+                    ctx.beginPath();
+                    ctx.moveTo(tailX, tailY);
+                    ctx.lineTo(s.x, s.y);
+                    ctx.stroke();
+                    // Head glow
+                    const rg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 8);
+                    rg.addColorStop(0, s.c);
+                    rg.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = rg;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, 8, 0, PI2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+                if (effectTimer > 6.0) {
+                    phase = 'effect3'; effectTimer = 0; effectItems = [];
+                    showLabel('🌹 Hoa Hồng');
+                    updatePoetry("Để tình yêu này mãi nở rộ, nồng nàn và dịu êm như cánh hồng.");
+                }
+            }
+
+            else if (phase === 'effect3') {
+                // Rose petals
+                effectTimer += dt;
+                if (frame % 4 === 0) spawnPetal();
+                for (let i = effectItems.length - 1; i >= 0; i--) {
+                    const p = effectItems[i];
+                    p.y += p.vy; p.x += p.vx + Math.sin(frame * 0.02 + i) * 0.3;
+                    p.rot += p.rotV;
+                    drawPetal(p);
+                    if (p.y > H + 30) effectItems.splice(i, 1);
+                }
+                ctx.globalAlpha = 1;
+                if (effectTimer > 6.0) {
+                    phase = 'heart'; effectTimer = 0; effectItems = [];
+                    introProgress = 0; introEase = 0; heartAlpha = 0; textAlpha = 0;
+                    updatePoetry("Và tất cả yêu thương này, anh gói trọn vào đây...");
+                }
+            }
+
+            // ===== HEART PHASE =====
+            else if (phase === 'heart' || phase === 'letter') {
+                if (introProgress < 1) introProgress = Math.min(1, introProgress + 0.008);
+                introEase = 1 - Math.pow(1 - introProgress, 3);
+                beatPhase += 2.5 * dt;
+                if (introProgress > 0.5) heartAlpha = Math.min(1, heartAlpha + 0.015);
+                if (introProgress > 0.7) textAlpha = Math.min(1, textAlpha + 0.012);
+
+                const sc = hs() * introEase;
+                const beat = 1 + 0.06 * Math.pow(Math.sin(beatPhase), 8);
+                const s = sc * beat;
+
+                // Floating mini hearts
+                if (effectItems.length < 10 && frame % 20 === 0) {
+                    effectItems.push({
+                        type: 'float', x: Math.random(), y: Math.random() + 0.5,
+                        sc: 1 + Math.random() * 2.5, sp: 0.0003 + Math.random() * 0.001,
+                        wa: 0.02 + Math.random() * 0.03, ph: Math.random() * PI2,
+                        a: 0.06 + Math.random() * 0.12,
+                        c: ['#ff5082', '#ff78aa', '#ff3264', '#c864b4', '#ffa0c8'][~~(Math.random() * 5)]
+                    });
+                }
+                for (const f of effectItems) {
+                    f.y -= f.sp; f.ph += 0.01;
+                    if (f.y < -0.1) { f.y = 1.1; f.x = Math.random() }
+                    const fx = f.x * W + Math.sin(f.ph) * f.wa * W;
+                    const fy = f.y * H;
+                    ctx.globalAlpha = f.a;
+                    ctx.fillStyle = f.c;
+                    heartPath(fx, fy, f.sc * (Math.min(W, H) / 750), 50);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+
+                // Glow
+                if (introEase > 0.01) {
+                    const glows = [
+                        { s: 1.5, c: 'rgba(255,50,100,0.03)' }, { s: 1.3, c: 'rgba(255,80,130,0.05)' },
+                        { s: 1.18, c: 'rgba(255,120,170,0.07)' }, { s: 1.08, c: 'rgba(255,150,190,0.10)' }
+                    ];
+                    for (const g of glows) { ctx.fillStyle = g.c; heartPath(cx, cy, s * g.s, 200); ctx.fill() }
+
+                    // Main heart
+                    const hg = ctx.createRadialGradient(cx - s * 3, cy - s * 5, 0, cx, cy, s * 14);
+                    hg.addColorStop(0, '#ff5090');
+                    hg.addColorStop(0.5, '#ff1450');
+                    hg.addColorStop(1, '#d00a3c');
+                    ctx.fillStyle = hg;
+                    heartPath(cx, cy, s, 400);
+                    ctx.fill();
+
+                    // Shine
+                    const sg = ctx.createRadialGradient(cx - s * 3.5, cy - s * 5, 0, cx - s * 3.5, cy - s * 5, s * 5);
+                    sg.addColorStop(0, 'rgba(255,220,240,0.25)');
+                    sg.addColorStop(1, 'rgba(255,220,240,0)');
+                    ctx.fillStyle = sg;
+                    ctx.beginPath(); ctx.arc(cx - s * 3.5, cy - s * 5, s * 5, 0, PI2); ctx.fill();
+                }
+
+                // Particles
+                if (introEase > 0.3 && frame % 3 === 0) { spawnParticle(); spawnParticle() }
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx; p.y += p.vy; p.vy -= 0.01; p.vx += (Math.random() - 0.5) * 0.06;
+                    p.life -= p.decay;
+                    if (p.life <= 0) { particles.splice(i, 1); continue }
+                    ctx.globalAlpha = Math.min(1, p.life) * 0.12;
+                    ctx.fillStyle = p.c;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 2.5, 0, PI2); ctx.fill();
+                    ctx.globalAlpha = Math.min(1, p.life);
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, PI2); ctx.fill();
+                }
+                if (particles.length > 200) particles = particles.slice(-200);
+                ctx.globalAlpha = 1;
+
+                // Text
+                if (textAlpha > 0) {
+                    const loveSize = Math.min(W, H) * 0.08 + 4 * Math.pow(Math.sin(beatPhase), 8);
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.font = `bold ${loveSize}px 'Dancing Script',cursive`;
+
+                    ctx.fillStyle = 'rgba(80,0,20,0.35)';
+                    ctx.globalAlpha = textAlpha;
+                    ctx.fillText('LOVE', cx + 2, cy - H * 0.01 + 2);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText('LOVE', cx, cy - H * 0.01);
+
+                    const msgY = cy + sc * 14 + 20;
+                    const msgSz = Math.min(W * 0.045, 32);
+                    ctx.font = `bold ${msgSz}px 'Quicksand',sans-serif`;
+
+                    const msg = "Happy Valentine's Day";
+                    const vis = msg.substring(0, Math.floor(msg.length * Math.min(1, textAlpha)));
+                    ctx.fillStyle = 'rgba(150,50,80,0.3)';
+                    ctx.fillText(vis, cx + 1, msgY + 1);
+                    ctx.fillStyle = '#ffb4dc';
+                    ctx.fillText(vis, cx, msgY);
+
+                    if (textAlpha >= 1) {
+                        const dsz = Math.min(W * 0.03, 20);
+                        ctx.font = `${dsz}px 'Quicksand',sans-serif`;
+                        ctx.fillStyle = '#c8a0ff';
+                        ctx.fillText('14 . 02 . 2026', cx, msgY + msgSz + 16);
+                    }
+                    ctx.globalAlpha = 1;
+
+                    // Auto-open letter after text fully shows
+                    if (textAlpha >= 1 && phase === 'heart') {
+                        effectTimer += dt;
+                        if (effectTimer > 2.5) {
+                            phase = 'letter';
+                            openLetter();
+                        }
+                    }
+                }
+            }
+
+            // ---- VIGNETTE ----
+            const vg = ctx.createRadialGradient(cx, H / 2, Math.min(W, H) * 0.3, cx, H / 2, Math.max(W, H) * 0.85);
+            vg.addColorStop(0, 'rgba(0,0,0,0)');
+            vg.addColorStop(1, 'rgba(0,0,0,0.45)');
+            ctx.fillStyle = vg;
+            ctx.fillRect(0, 0, W, H);
+        }
+        requestAnimationFrame(loop);
+    </script>
+</body>
+
+</html>
